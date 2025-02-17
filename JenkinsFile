@@ -19,12 +19,12 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                node { label 'any' }  // Ensures workspace is available
+            environment {
+                    SONAR_URL = "http://localhost:9000"
             }
             steps {
-                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                    sh 'mvn sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN'
+                withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+                sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=${SONAR_URL}'
                 }
             }
         }
@@ -55,13 +55,13 @@ pipeline {
                 node { label 'any' }  // Ensures workspace is available
             }
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: '27727626-31a0-4d61-ab9d-18353c0d6b89', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $EC2_KEY $EC2_USER@your.ec2.instance.ip << 'EOF'
                         docker pull $DOCKER_IMAGE
                         docker stop springboot-app || true
                         docker rm springboot-app || true
-                        docker run -d --name springboot-app -p 8080:8080 $DOCKER_IMAGE
+                        docker run -d --name springboot-app -p 8081:8081 $DOCKER_IMAGE
                         EOF
                     '''
                 }
