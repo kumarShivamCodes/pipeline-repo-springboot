@@ -20,8 +20,11 @@ pipeline {
         stage('SonarQube Analysis') {
 
          agent {
-                         node { label 'any' }  // Ensures workspace is available
-               }
+                         docker {
+                             image 'jelastic/maven:3.9.5-openjdk-21'
+                             args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                         }
+                     }
             environment {
                 SONAR_URL = "http://localhost:9000"
             }
