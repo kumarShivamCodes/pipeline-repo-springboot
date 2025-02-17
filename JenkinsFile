@@ -37,26 +37,24 @@ pipeline {
 
         stage('Build Docker Image') {
             agent {
-                            docker {
-                                image 'docker:20.10'
-                                args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-                            }
-                        }
-
+                docker {
+                    image 'docker:20.10'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 // Build the Docker image using the Dockerfile in the workspace.
-                sh 'sudo docker build -t $DOCKER_IMAGE .'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Push Docker Image') {
             agent {
-                            docker {
-                                image 'docker:20.10'
-                                args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-                            }
-                        }
-
+                docker {
+                    image 'docker:20.10'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 // Log in to Docker Hub and push the built image.
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -68,14 +66,13 @@ pipeline {
 
         stage('Deploy to EC2') {
             agent {
-                            docker {
-                                image 'docker:20.10'
-                                args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-                            }
-                        }
-
+                docker {
+                    image 'docker:20.10'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                // Deploy to an EC2 instance via SSH. This assumes SSH credentials are configured.
+                // Deploy to an EC2 instance via SSH.
                 withCredentials([sshUserPrivateKey(credentialsId: '27727626-31a0-4d61-ab9d-18353c0d6b89', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $EC2_KEY $EC2_USER@your.ec2.instance.ip <<EOF
