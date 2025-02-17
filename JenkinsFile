@@ -2,14 +2,6 @@ pipeline {
     agent none  // Disable default agent at pipeline level
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                cleanWs() // Clean workspace
-                git branch: 'main', url: 'https://github.com/kumarShivamCodes/pipeline-repo-springboot.git', poll: false
-            }
-        }
-
         stage('Build and Test') {
             agent {
                 docker {
