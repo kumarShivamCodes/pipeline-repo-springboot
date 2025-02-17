@@ -18,6 +18,10 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+
+         agent {
+                         node { label 'any' }  // Ensures workspace is available
+               }
             environment {
                 SONAR_URL = "http://localhost:9000"
             }
