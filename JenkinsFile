@@ -1,0 +1,77 @@
+pipeline {
+    agent none  // Disable default agent at pipeline level
+
+    stages {
+
+        stage('Build and Test') {
+            agent {
+                docker {
+                    image 'jelastic/maven:3.9.5-openjdk-21'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+            steps {
+                script {
+                    sh 'ls -ltr'
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            agent {
+                node { label 'any' }  // Ensures workspace is available
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    sh 'mvn sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            agent {
+                node { label 'any' }  // Ensures workspace is available
+            }
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            agent {
+                node { label 'any' }  // Ensures workspace is available
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push $DOCKER_IMAGE'
+                }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            agent {
+                node { label 'any' }  // Ensures workspace is available
+            }
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i $EC2_KEY $EC2_USER@your.ec2.instance.ip << 'EOF'
+                        docker pull $DOCKER_IMAGE
+                        docker stop springboot-app || true
+                        docker rm springboot-app || true
+                        docker run -d --name springboot-app -p 8080:8080 $DOCKER_IMAGE
+                        EOF
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()  // Ensure workspace is available
+        }
+    }
+}
