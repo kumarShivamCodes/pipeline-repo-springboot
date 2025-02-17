@@ -19,8 +19,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             agent {
-                    node { label 'any' }  // Ensure workspace is available
-                  }
+                docker {
+                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                  args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                }
+              }
             environment {
                     SONAR_URL = "http://localhost:9000"
             }
