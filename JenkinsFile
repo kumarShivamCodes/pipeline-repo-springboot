@@ -38,18 +38,13 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:latest'  // Use the official Docker image
-                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'  // Allow access to host's Docker daemon
+                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                  args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
                 }
             }
             steps {
-                script {
-                    // Verify Docker is accessible
-                    sh 'docker --version'
-
-                    // Build the Docker image using the Dockerfile in the workspace
-                    sh 'docker build -t $DOCKER_IMAGE .'
-                }
+                // Build the Docker image using the Dockerfile in the workspace.
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
@@ -57,7 +52,7 @@ pipeline {
             agent {
                 docker {
                   image 'abhishekf5/maven-abhishek-docker-agent:v1'
-                  args '-v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                  args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
                 }
             }
             steps {
@@ -70,6 +65,10 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
+
+            steps {
+                    echo "Starting Docker Build Stage..."
+            }
 
             agent {
                 docker {
