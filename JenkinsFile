@@ -44,7 +44,7 @@ pipeline {
             }
             steps {
                 // Build the Docker image using the Dockerfile in the workspace.
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'sudo docker build -t $DOCKER_IMAGE .'
             }
         }
 
