@@ -38,8 +38,8 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:20.10'
-                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                  args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
                 }
             }
             steps {
@@ -51,8 +51,8 @@ pipeline {
         stage('Push Docker Image') {
             agent {
                 docker {
-                    image 'docker:20.10'
-                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                  args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
                 }
             }
             steps {
@@ -65,11 +65,12 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
+
             agent {
                 docker {
-                    image 'docker:20.10'
-                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-                }
+                    image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                     args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                     }
             }
             steps {
                 // Deploy to an EC2 instance via SSH.
