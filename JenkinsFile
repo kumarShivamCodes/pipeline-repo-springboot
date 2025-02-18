@@ -42,7 +42,7 @@ pipeline {
                   args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
                 }
             }
-            /steps {
+            steps {
                 // Build the Docker image using the Dockerfile in the workspace.
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
