@@ -36,10 +36,6 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-
-            steps {
-                    echo "Starting Docker Build Stage..."
-            }
             agent {
                 docker {
                   image 'abhishekf5/maven-abhishek-docker-agent:v1'
