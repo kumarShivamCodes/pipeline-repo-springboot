@@ -86,7 +86,6 @@ pipeline {
                         sudo docker stop springboot-app || true
                         sudo docker rm springboot-app || true
                         sudo docker run -d --name springboot-app -p 8081:8081 $DOCKER_IMAGE
-                        EOF
                     '''
                 }
             }
