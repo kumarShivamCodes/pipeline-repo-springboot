@@ -21,4 +21,10 @@ public class BookController {
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
     }
+
+    @GetMapping("/hello")
+    public String helo()
+    {
+        return "Hello WOrld";
+    }
 }
