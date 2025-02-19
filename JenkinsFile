@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             // Use a Docker image that has Maven, Java 21, and (optionally) Docker CLI installed.
-            image 'jelastic/maven:3.9.5-openjdk-21'
+            image 'maven:3.9.5-eclipse-temurin-21'
             // Mount the host Docker socket so the container can run docker commands.
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
         }
@@ -36,12 +36,12 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            agent {
-                docker {
-                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
-                  args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
-                }
-            }
+            //agent {
+                            //docker {
+                                //image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                                 //args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                                 //}
+                        //}
             steps {
                 // Build the Docker image using the Dockerfile in the workspace.
                 sh 'docker build -t $DOCKER_IMAGE .'
@@ -49,12 +49,12 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            agent {
-                docker {
-                  image 'abhishekf5/maven-abhishek-docker-agent:v1'
-                  args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
-                }
-            }
+            //agent {
+                            //docker {
+                                //image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                                 //args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                                 //}
+                        //}
             steps {
                 // Log in to Docker Hub and push the built image.
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -65,12 +65,12 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
-            agent {
-                docker {
-                    image 'abhishekf5/maven-abhishek-docker-agent:v1'
-                     args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
-                     }
-            }
+            //agent {
+                //docker {
+                    //image 'abhishekf5/maven-abhishek-docker-agent:v1'
+                     //args '--user root --privileged -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+                     //}
+            //}
             steps {
                 // Deploy to an EC2 instance via SSH.
                 withCredentials([sshUserPrivateKey(credentialsId: '27727626-31a0-4d61-ab9d-18353c0d6b89', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
