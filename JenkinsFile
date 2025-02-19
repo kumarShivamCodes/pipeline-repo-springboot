@@ -79,7 +79,7 @@ pipeline {
 
                 sh 'apt-get update && apt-get install -y openssh-client' // Install SSH client
                 // Deploy to an EC2 instance via SSH.
-                withCredentials([sshUserPrivateKey(credentialsId: '27727626-31a0-4d61-ab9d-18353c0d6b89', keyFileVariable: 'EC2_KEY', usernameVariable: 'EC2_USER')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: '44.201.73.19', keyFileVariable: 'EC2_KEY', usernameVariable: 'ubuntu')]) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $EC2_KEY $EC2_USER@44.201.73.19 <<EOF
                         docker pull $DOCKER_IMAGE
