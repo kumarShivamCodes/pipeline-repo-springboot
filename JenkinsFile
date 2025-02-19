@@ -82,10 +82,10 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: '44.201.73.19', keyFileVariable: 'EC2_KEY')]) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $EC2_KEY ubuntu@44.201.73.19 <<EOF
-                        docker pull $DOCKER_IMAGE
-                        docker stop springboot-app || true
-                        docker rm springboot-app || true
-                        docker run -d --name springboot-app -p 8081:8081 $DOCKER_IMAGE
+                        sudo docker pull $DOCKER_IMAGE
+                        sudo docker stop springboot-app || true
+                        sudo docker rm springboot-app || true
+                        sudo docker run -d --name springboot-app -p 8081:8081 $DOCKER_IMAGE
                         EOF
                     '''
                 }
