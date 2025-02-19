@@ -79,9 +79,9 @@ pipeline {
 
                 sh 'apt-get update && apt-get install -y openssh-client' // Install SSH client
                 // Deploy to an EC2 instance via SSH.
-                withCredentials([sshUserPrivateKey(credentialsId: '44.201.73.19', keyFileVariable: 'EC2_KEY', usernameVariable: 'ubuntu')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: '44.201.73.19', keyFileVariable: 'EC2_KEY')]) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -i $EC2_KEY $EC2_USER@44.201.73.19 <<EOF
+                        ssh -o StrictHostKeyChecking=no -i $EC2_KEY ubuntu@44.201.73.19 <<EOF
                         docker pull $DOCKER_IMAGE
                         docker stop springboot-app || true
                         docker rm springboot-app || true
